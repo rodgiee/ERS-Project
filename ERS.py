@@ -1,5 +1,8 @@
 import random
-def Game(num_players):
+def Game():
+    num_players= input("How many players?: ")
+    main_players_name = input("What is your name?: ")
+
     deck = [] # initialize the deck of cards for this game
     game_players = [] # Initialize the players playing this game
     '''
@@ -7,58 +10,82 @@ def Game(num_players):
     Iterate for each suit to create a new value under that suit,
     Shuffle card objects in deck
     '''
+    print(f"\nDeck initializing...(currently {len(deck)} in deck)")
     for suits in range(4):
         for value in range (1,14):
             deck.append(Card(suits, value, -1)) # append this new card to the deck list
+    print(f"Deck Initalized! (created {len(deck)} cards in deck)\n")
 
-
+    print(f"Deck shuffling... (first card = {str(deck[0])})")
     random.shuffle(deck) # shuffle the deck
-    
+    print(f"Deck shuffled! (first card now = {str(deck[0])})\n")
+
     '''
     Create player objects based on desired player count input
+    Also randomize names for bots
     Include user + input # of users
     '''
-    for p in range(int(num_players) + 1):
-        game_players.append(Player(p, []))
+    first_names = ["Zonko", "Fizzler", "Snorple", "Quibly", "Norbix", "Jaxor", "Bloopo", "Zindle", "Crunkle", "Vexon"]
+    last_names = ["Glimbo", "Torkel", "Zappy", "Marnix", "Flurbo", "Kazzle", "Droopo", "Wibbit", "Tronix", "Blixel"]
+    print("Creating players...")
+    game_players.append(Player(0, [], main_players_name)) # Create main player
+    for p in range(1, int(num_players) + 0): # Create bot playeres
+        game_players.append(Player(p, [], random.choice(first_names)+random.choice(last_names)))
+    print("Players created!")
+    print("(", end="", flush=True)
+    for p in game_players: print(f"{str(p)}, ", end="", flush=True)
+    print(")", end="", flush=True)
     
     '''
     Distribute the current game's deck of cards:
     Start with the 0 player --> take the card at index 0 --> append to player's card inventory while removing it from game deck -->
     move to next player --> repeat until no more cards in deck
     '''
+    print("\n\nDistributing cards to players...")
     current_player = 0
     while(len(deck) > 0):
         game_players[current_player].inventory.append(deck.pop(0))
         current_player = (current_player + 1) % len(game_players)
+    print("Distributed cards to players!")
+    for p in game_players: print(f"({str(p)} has {len(p.inventory)} cards.)")
 
     is_game_won = False
-    is_pattern = False
+    #is_pattern = False
     current_player = 0
 
     while not (is_game_won):
-        #check for patterns
-        top_card_index = len(deck) - 1
+        ##check for patterns
+        #top_card_index = len(deck) - 1
+#
+        #if (len(deck) >= 2 and (deck[top_card_index] == deck[top_card_index - 1]) ): # check for pair 
+                #is_pattern = True
+#
+        #if (len(deck) >= 3 and (deck[top_card_index] == deck[top_card_index - 2]) ): # check for sandiwch
+                #is_pattern = True
 
-        if (len(deck) >= 2 and (deck[top_card_index] == deck[top_card_index - 1]) ): # check for pair 
-                is_pattern = True
-
-        if (len(deck) >= 3 and (deck[top_card_index] == deck[top_card_index - 2]) ): # check for sandiwch
-                is_pattern = True
-        
         if(current_player == 0):
             pass
         current_player = (current_player + 1) %  len(game_players)
 
-def player_thread():
+def player_thread(current_player, player_object):
+    
+    if (current_player == 0):
+        pass
+
+def bot_thread():
     pass
         
 class Player:
     '''
-    Player = id, card inventory
+    Player = id, card inventory, name
     '''
-    def __init__(self, p_id, inventory):
+    def __init__(self, p_id, inventory, name):
         self.p_id = p_id # integer player identifier
         self.inventory = inventory # list of cards player holds
+        self.name = name # string name of player
+
+    def __str__(self):
+        return self.name
 
 class Card:
     '''
@@ -96,5 +123,4 @@ class Card:
         return self.value == other.value # Card is equal if values are the same
 
 if __name__ == "__main__":
-    input_players = input("How many players?: ")
-    Game(input_players)
+    Game()
