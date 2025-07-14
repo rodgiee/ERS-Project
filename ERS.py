@@ -3,29 +3,69 @@ def Game(num_players):
     deck = [] # initialize the deck of cards for this game
     game_players = [] # Initialize the players playing this game
     '''
-    Initialize deck of cards, a nested loop where each suit will be iterated for all possible values in cards
+    Initialize deck of cards,
+    Iterate for each suit to create a new value under that suit,
+    Shuffle card objects in deck
     '''
     for suits in range(4):
         for value in range (1,14):
             deck.append(Card(suits, value, -1)) # append this new card to the deck list
 
+
     random.shuffle(deck) # shuffle the deck
-
-    for p in range(1, int(num_players) + 1):
+    
+    '''
+    Create player objects based on desired player count input
+    Include user + input # of users
+    '''
+    for p in range(int(num_players) + 1):
         game_players.append(Player(p, []))
-
+    
+    '''
+    Distribute the current game's deck of cards:
+    Start with the 0 player --> take the card at index 0 --> append to player's card inventory while removing it from game deck -->
+    move to next player --> repeat until no more cards in deck
+    '''
     current_player = 0
     while(len(deck) > 0):
-        game_players[current_player].player_cards.append(deck.pop(0))
-        current_player = (current_player + 1) % 3
+        game_players[current_player].inventory.append(deck.pop(0))
+        current_player = (current_player + 1) % len(game_players)
 
-    breakpoint()
+    is_game_won = False
+    is_pattern = False
+    current_player = 0
+
+    while not (is_game_won):
+        #check for patterns
+        top_card_index = len(deck) - 1
+
+        if (len(deck) >= 2 and (deck[top_card_index] == deck[top_card_index - 1]) ): # check for pair 
+                is_pattern = True
+
+        if (len(deck) >= 3 and (deck[top_card_index] == deck[top_card_index - 2]) ): # check for sandiwch
+                is_pattern = True
+        
+        if(current_player == 0):
+            pass
+        current_player = (current_player + 1) %  len(game_players)
+
+def player_thread():
+    pass
+        
 class Player:
-    def __init__(self, player_id, player_cards):
-        self.player_id = player_id # integer player identifier
-        self.player_cards = player_cards # list of cards player holds
+    '''
+    Player = id, card inventory
+    '''
+    def __init__(self, p_id, inventory):
+        self.p_id = p_id # integer player identifier
+        self.inventory = inventory # list of cards player holds
 
 class Card:
+    '''
+    Card: 
+    - suit - 0 = spades, 1 - clubs, 2 = hearts, 3 = diamonds
+    - value - 1-9, 10(Jack), 11(Queen), 12(King), 13(Ace)
+    '''
     def __init__(self, suit, value, owner):
         self.suit = suit # 0 = spades, 1 = clubs, 2 = hearts, 3 = diamonds
         self.value = value # 1 - 9, face cards
@@ -34,8 +74,10 @@ class Card:
     def __str__(self):
         numbers = ["Zero", "One", "Two", "Three", "Four" , "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"]
         listed_suits = [['Spades', '♠'], ['Clubs', '♣'], ['Hearts', '♥'], ['Diamonds', '♦']]
-        suit_str = listed_suits[self.suit][0] # clubs, spades, hearts, diamonds
-        suit_art = listed_suits[self.suit][1] # clubs, spades, hearts, diamonds
+
+        suit_str = listed_suits[self.suit][0] #  string represent suit in name
+        suit_art = listed_suits[self.suit][1] #  string represent suit in art
+
         if (self.value == 11): # When card is Jack
             return f'J{suit_art} - {numbers[self.value]} of {suit_str}'
 
@@ -51,7 +93,7 @@ class Card:
         return f'{self.value}{suit_art} - {numbers[self.value]} of {suit_str}'
     
     def __eq__(self, other):
-        return self.value == other.value
+        return self.value == other.value # Card is equal if values are the same
 
 if __name__ == "__main__":
     input_players = input("How many players?: ")

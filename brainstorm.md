@@ -15,6 +15,7 @@ Rules
         - Queen = 2
         - King  = 3
         - Ace   = 4
-
+game loop check
+    - 
 
 
