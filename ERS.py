@@ -42,17 +42,17 @@ def Game():
     move to next player --> repeat until no more cards in deck
     '''
     print("\n\nDistributing cards to players...")
-    current_player = 0
+    current_player_id = 0
     while(len(deck) > 0):
-        game_players[current_player].inventory.append(deck.pop(0))
-        current_player = (current_player + 1) % len(game_players)
+        game_players[current_player_id].inventory.append(deck.pop(0))
+        current_player_id = (current_player_id + 1) % len(game_players)
     print("Distributed cards to players!")
     for p in game_players: print(f"({str(p)} has {len(p.inventory)} cards.)")
 
     is_game_won = False
     #is_pattern = False
-    current_player = 0
-
+    current_player_id = 0
+    main_player_object = game_players[0]
     while not (is_game_won):
         ##check for patterns
         #top_card_index = len(deck) - 1
@@ -63,13 +63,14 @@ def Game():
         #if (len(deck) >= 3 and (deck[top_card_index] == deck[top_card_index - 2]) ): # check for sandiwch
                 #is_pattern = True
 
-        if(current_player == 0):
-            pass
-        current_player = (current_player + 1) %  len(game_players)
+        if(current_player_id == 0):
+            player_thread(current_player_id, main_player_object)
+        current_player_id = (current_player_id + 1) %  len(game_players)
 
-def player_thread(current_player, player_object):
-    
-    if (current_player == 0):
+def player_thread(current_player_id, player_object):
+    print("Hello")
+    breakpoint()
+    if (current_player_id == 0):
         pass
 
 def bot_thread():
