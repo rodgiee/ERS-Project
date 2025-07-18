@@ -1,6 +1,8 @@
 import random
 import time
 import threading
+import os
+
 def Game():
     game_bot_count= input("How many bots?: ")
     game_main_player_name = input("What is your name?: ")
@@ -64,21 +66,16 @@ def Game():
     global deck_lock
     deck_lock = threading.Lock()
     
+    global is_pattern
+    is_pattern = False
+    time.sleep(3)
+    os.system('clear')
     while (is_game_running):
         game_main_player = threading.Thread(target=control_player, args=(game_current_player_id, main_player_object, 0))
         bot_threads = []
         for bot_index in range(1, len(game_players)):
             bot_threads.append(threading.Thread(target=control_player, args=(game_current_player_id, game_players[bot_index], bot_index)))
 
-        ##check for patterns
-        #top_card_index = len(game_deck) - 1
-#
-        #if (len(game_deck) >= 2 and (game_deck[top_card_index] == game_deck[top_card_index - 1]) ): # check for pair 
-                #is_pattern = True
-#
-        #if (len(game_deck) >= 3 and (game_deck[top_card_index] == game_deck[top_card_index - 2]) ): # check for sandiwch
-                #is_pattern = True
-        
         game_main_player.start()
         for bot in bot_threads:
             bot.start()
@@ -86,18 +83,34 @@ def Game():
         game_main_player.join()
         for bot in bot_threads:
             bot.join()
-
+               
         game_current_player_id = (game_current_player_id + 1) %  len(game_players)
+
+def check_pattern():
+    top_card_index = len(game_deck) - 1
+    global is_pattern
+    if (len(game_deck) >= 2 and (game_deck[top_card_index] == game_deck[top_card_index - 1]) ): # check for pair 
+        is_pattern = True
+    elif (len(game_deck) >= 3 and (game_deck[top_card_index] == game_deck[top_card_index - 2]) ): # check for sandwich
+        is_pattern = True
+    else:
+        is_pattern = False
 
 def slap():
     pass
 
 def place_card(player_object):
+    # take the card from player's inventory at the last index and append to game deck
     top_card_index = len(player_object.inventory) - 1
     top_card = player_object.inventory.pop(top_card_index)
+    
     deck_lock.acquire()
     game_deck.append(top_card)
+    check_pattern()
     deck_lock.release()
+    
+    print(f'{str(player_object)} places {top_card}')
+
     return top_card
 
 def control_player(game_current_player_id, player_object, player_id):
@@ -106,15 +119,14 @@ def control_player(game_current_player_id, player_object, player_id):
             player_input = input("(p)lace or (s)lap?: ") 
             if (player_input in ['p', 'place']):
                 place_card(player_object)
-                return
+                break
             if (player_input in ['s', 'slap']):
                 slap()
-                return
+                break
     else: # case if bot
         if game_current_player_id == player_id:
             time.sleep(random.random() * 2) 
-            card_placed = place_card(player_object)
-            print(f'{str(player_object)} places {card_placed}')
+            place_card(player_object)
             return
 
 class Player:
@@ -125,10 +137,10 @@ class Player:
         self.p_id = p_id # integer player identifier
         self.inventory = inventory # list of cards player holds
         self.name = name # string name of player
-
+    
     def __str__(self):
         return self.name
-
+    
 class Card:
     '''
     Card: 
@@ -139,6 +151,20 @@ class Card:
         self.suit = suit # 0 = spades, 1 = clubs, 2 = hearts, 3 = diamonds
         self.value = value # 1 - 9, face cards
         self.owner = owner # who owns this card?
+        
+        # determine card's chance value
+        match self.value:
+            case 10: # jack
+                self.chance = 1
+            case 12: # queen
+                self.chance = 2
+            case 13: # king
+                self.chance = 3
+            case 14: # ace
+                self.chance = 4
+            case _: # other cards have no chance value
+                self.chance = 0
+                
 
     def __str__(self):
         numbers = ["Zero", "One", "Two", "Three", "Four" , "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace"]
