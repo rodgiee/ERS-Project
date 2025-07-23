@@ -60,31 +60,38 @@ def Game():
     #is_pattern = False
     game_current_player_id = 0
 
-    # reference to main player object 
-    main_player_object = game_players[0]
 
     global deck_lock
     deck_lock = threading.Lock()
     
     global is_pattern
     is_pattern = False
+
+    global main_player_input
+    global game_turn_finished
+    main_player_input = None
+
+    input_thread = threading.Thread(target=input_handler)
+    input_thread.start()
+
     time.sleep(3)
     os.system('clear')
     while (is_game_running):
-        game_main_player = threading.Thread(target=control_player, args=(game_current_player_id, main_player_object, 0))
-        bot_threads = []
-        for bot_index in range(1, len(game_players)):
-            bot_threads.append(threading.Thread(target=control_player, args=(game_current_player_id, game_players[bot_index], bot_index)))
+        game_turn_finished = False
+        threads = []
+        for player_index in range(len(game_players)):
+            threads.append(threading.Thread(target=control_player, args=(game_current_player_id, game_players[player_index], player_index)))
 
-        game_main_player.start()
-        for bot in bot_threads:
-            bot.start()
-        
-        game_main_player.join()
-        for bot in bot_threads:
-            bot.join()
-               
+        print(f'{game_players[game_current_player_id]}')
+        for player_thread in threads:
+            player_thread.start()
+
+        for player_thread in threads:
+            player_thread.join()
+
         game_current_player_id = (game_current_player_id + 1) %  len(game_players)
+    
+    input_thread.join()
 
 def check_pattern():
     top_card_index = len(game_deck) - 1
@@ -96,8 +103,12 @@ def check_pattern():
     else:
         is_pattern = False
 
-def slap():
-    pass
+def slap(player_object):
+    global is_pattern
+    global game_deck
+    if(is_pattern):
+        player_object.inventory.extend(game_deck)
+        game_deck = []
 
 def place_card(player_object):
     # take the card from player's inventory at the last index and append to game deck
@@ -113,21 +124,31 @@ def place_card(player_object):
 
     return top_card
 
+def input_handler():
+    global main_player_input
+    while(True):
+        main_player_input = str(input())
+
 def control_player(game_current_player_id, player_object, player_id):
-    if (player_id == 0 and game_current_player_id == player_id): # case if main player
-        while(True):
-            player_input = input("(p)lace or (s)lap?: ") 
-            if (player_input in ['p', 'place']):
+    global game_turn_finished
+    if (player_id == 0): # case if main player
+        while(not game_turn_finished):
+            global main_player_input
+            if (main_player_input in ['p', 'place'] and game_current_player_id == player_id):
                 place_card(player_object)
+                main_player_input = None
                 break
-            if (player_input in ['s', 'slap']):
-                slap()
+            if (main_player_input in ['s', 'slap']):
+                slap(player_object)
+                main_player_input = None
                 break
     else: # case if bot
         if game_current_player_id == player_id:
-            time.sleep(random.random() * 2) 
+            time.sleep(random.random() * 2 ) 
             place_card(player_object)
+            game_turn_finished = True
             return
+    return
 
 class Player:
     '''

@@ -19,3 +19,21 @@ game loop check
     - 
 
 
+---
+Threading Issue:
+
+boolean is_race_done
+
+thread2:
+	racing
+	finished race
+
+thread1:
+	call thread1_check_race
+	join
+	return
+	
+	
+thread1_check_race:
+	
+
