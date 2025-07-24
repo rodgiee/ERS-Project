@@ -9,7 +9,7 @@ class Card():
         
 def pick_random_card_image():
     suits = ['Spades', 'Hearts', 'Clubs', 'Diamonds']
-    values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+    values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
     image_file = f'images/card{random.choice(suits)}{random.choice(values)}.png'
     image = pygame.image.load(image_file)
     return image
@@ -53,23 +53,21 @@ image_test = pygame.image.load("images/cardClubs8.png")
 surface_load = []
 
 size = (200, 200)
-position_x_coordinate = game_screen.get_width() // 2 - (size[0] // 2)
-position_y_coordinate = game_screen.get_height() // 2 - (size[1] // 2)
-table_border_rect = pygame.Rect(position_x_coordinate, position_y_coordinate, size[0], size[1])
+x = game_screen.get_rect().centerx - (size[0] // 2)
+y = game_screen.get_rect().centery - (size[1] // 2)
+item_rect = pygame.Rect(x, y, size[0], size[1])
+item_color = '0x7B3F00'
+item = (item_color, item_rect)
 
-table_border_color = '0x7B3F00'
+surface_load.append(item)
 
-table_border = (table_border_color, table_border_rect)
-surface_load.append(table_border)
-
-table_fill_color =  '0x35654D'
 size = (188, 188)
-position_x_coordinate = game_screen.get_width() // 2 - (size[0] // 2)
-position_y_coordinate = game_screen.get_height() // 2 - (size[1] // 2)
-table_fill_rect = pygame.Rect(position_x_coordinate, position_y_coordinate, size[0], size[1])
-table_fill = (table_fill_color, table_fill_rect)
-surface_load.append(table_fill)
-
+x = game_screen.get_rect().centerx - (size[0] // 2)
+y = game_screen.get_rect().centery - (size[1] // 2)
+item_rect = pygame.Rect(x, y, size[0], size[1])
+item_color =  '0x35654D'
+item = (item_color, item_rect)
+surface_load.append(item)
 
 cards = []
 cards.append(Card(20, 20, 0, image_test))
@@ -87,6 +85,8 @@ while is_running:
 
     for card in cards:
         move_card(card)
+
+    if (len(cards) > 15): cards.pop(0)
     
     pygame.display.flip()
 
