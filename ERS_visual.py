@@ -8,7 +8,7 @@ def move_card(game_screen, card):
     # move image
     destination_x = game_screen.get_rect().centerx 
     destination_y = game_screen.get_rect().centery
-    rate = 0.02
+    rate = 0.03
     #print(card.x,card.y)
     #print(card.owner.position)
     card.x = card.x + (destination_x - card.x) * rate
@@ -94,6 +94,7 @@ def Game():
     random_first_names = ["Zonko", "Fizzler", "Snorple", "Quibly", "Norbix", "Jaxor", "Bloopo", "Zindle", "Crunkle", "Vexon"]
     random_last_names = ["Glimbo", "Torkel", "Zappy", "Marnix", "Flurbo", "Kazzle", "Droopo", "Wibbit", "Tronix", "Blixel"]
     print("Creating players...")
+    
     game_players.append(Player(0, game_main_player_name, (300, 500))) # Create main player
     game_players.append(Player(1, random.choice(random_first_names)+random.choice(random_last_names), (0, 250))) # Create main player
     game_players.append(Player(2, random.choice(random_first_names)+random.choice(random_last_names), (300, 0))) # Create main player
@@ -108,7 +109,6 @@ def Game():
     for suit in range(4):
         for value in range (2,14):
             game_deck.append(Card(suit, value)) # append this new card to the game_deck list
-            
     print(f"Deck Initalized! (created {len(game_deck)} cards in game_deck)\n")
 
     print(f"Deck shuffling... (first card = {str(game_deck[0])})")
@@ -122,17 +122,16 @@ def Game():
     while(len(game_deck) > 0):
         card = game_deck.pop(0)
         player = game_players[game_current_player_id]
-        
         card.x = player.position[0]
         card.y = player.position[1]
         card.owner = player
         card.angle = random.random() * 360
-        player.inventory.append(card)
+        game_players[game_current_player_id].inventory.append(card)
         
         game_current_player_id = (game_current_player_id + 1) % len(game_players)
+
     print("Distributed cards to players!")
     for p in game_players: print(f"({str(p)} has {len(p.inventory)} cards.)")
-
 
     global is_game_running
     is_game_running = True
@@ -187,6 +186,8 @@ def Game():
                         main_player_input = 'place'
                     case pygame.K_SPACE:
                         main_player_input = 'slap'
+                    case pygame.K_a:
+                        print(len(game_players[0].inventory))
 
         game_background_color = '0x80001f'
         game_screen.fill(game_background_color)
@@ -221,8 +222,11 @@ def slap(player_object):
     global is_pattern
     global game_deck
     if(is_pattern):
+        print(f'had {len(player_object.inventory)} cards.')
         player_object.inventory.extend(game_deck)
         game_deck = []
+        print(f'now {len(player_object.inventory)} cards.')
+        
 
 def place_card(player_object):
     # take the card from player's inventory at the last index and append to game deck
@@ -245,32 +249,36 @@ def place_card(player_object):
 
 def control_player(game_current_player_id, player_object, player_id):
     global game_turn_finished
+    global is_pattern
     if (player_id == 0): # case if main player
         while(not game_turn_finished and is_game_running):
             global main_player_input
+            
             if (main_player_input in ['p', 'place'] and game_current_player_id == player_id):
                 place_card(player_object)
                 main_player_input = None
+                game_turn_finished = True
                 break
-            if (main_player_input in ['s', 'slap']):
+            if (main_player_input in ['s', 'slap'] and is_pattern):
                 slap(player_object)
                 main_player_input = None
                 break
-        game_turn_finished = True
     else: # case if bot
         if game_current_player_id == player_id:
-            time.sleep(random.random() * 2 ) 
-            place_card(player_object)
+            time.sleep(random.random() * 1 + 0.5 ) 
+            if len(player_object.inventory) > 0:
+                place_card(player_object)
             game_turn_finished = True
+            
     return
 
 class Player:
     '''
     Player = id, card inventory, name
     '''
-    def __init__(self, p_id, name, position, inventory = []):
+    def __init__(self, p_id, name, position):
         self.p_id = p_id # integer player identifier
-        self.inventory = inventory # list of cards player holds
+        self.inventory = [] # list of cards player holds
         self.name = name # string name of player
         self.position = position
     
