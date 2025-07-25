@@ -222,10 +222,12 @@ def slap(player_object):
     global is_pattern
     global game_deck
     if(is_pattern):
+        print(f'{player_object} slaps in!')
         print(f'had {len(player_object.inventory)} cards.')
         player_object.inventory.extend(game_deck)
         game_deck = []
         print(f'now {len(player_object.inventory)} cards.')
+        is_pattern = False
         
 
 def place_card(player_object):
@@ -264,6 +266,16 @@ def control_player(game_current_player_id, player_object, player_id):
                 main_player_input = None
                 break
     else: # case if bot
+        if (is_pattern):
+            # bot will detect for patterns and slap in if detected
+            # in case for race conditions we will need to do a mutex lock and re-verify if there is still a pattern
+            time.sleep(random.random() * 1 + 1)
+            deck_lock.acquire()
+            if (is_pattern):
+                slap(player_object)
+            deck_lock.release()
+            game_turn_finished = True
+
         if game_current_player_id == player_id:
             time.sleep(random.random() * 1 + 0.5 ) 
             if len(player_object.inventory) > 0:
