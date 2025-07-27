@@ -15,6 +15,7 @@ def frame_background_update(load_order):
     for surface in load_order:
         pygame.draw.rect(game_screen, surface[0], surface[1])
 
+scale_test = 1
 def hand_update(screen, image):
     # 160, 500 initial
     # 160, 120 destination
@@ -23,12 +24,17 @@ def hand_update(screen, image):
     #rate = 0.02
     #image.x = image.x + (destination_x - image.x) * rate
     #image.y = image.y + (destination_y - image.y) * rate
-    image.y=120
 
-    image.surface= pygame.transform.smoothscale_by(image.surface, 0.999999)
+    image.y=120
+    global scale_test
+    scale_test -= 0.001
+    rescaled = pygame.transform.smoothscale_by(image.surface, scale_test)
+    rescaled.get_rect(center=image.surface.get_rect()).center = image.surface.get_rect().center
     
+    #image.surface= pygame.transform.smoothscale_by(image.surface, 0.999999)
     
-    screen.blit(image.surface, (image.x, image.y))
+    #screen.blit(image.surface, (image.x, image.y))
+    screen.blit(rescaled, (image.x, image.y))
 
 pygame.init()
 
