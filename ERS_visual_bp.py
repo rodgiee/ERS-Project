@@ -1,21 +1,83 @@
+import pygame
 import random
 import time
 import threading
 import os
 
+def game_handler(game_players):
+    # game loop main conditional
+    # also used by game_visual_handler() to see if game is finished --> closes out if so
+    # game_current_player_id checks who's turn is it 
+    global is_game_running
+    is_game_running = True 
+    game_current_player_id = 0
+
+    # mutex lock for game_deck to prevent race conditions
+    global deck_lock
+    deck_lock = threading.Lock()
+    
+    # detects if there is either a "sandwich" or "pair", used to check if the player slapped correctly or not
+    # used by slap() to verify
+    global is_pattern
+    is_pattern = False
+
+    # player input needs to be a parallel process, a input_handler always listens for player input and updates to main_player_input
+    # whole game loop will hang on player's input if not parallel'
+    global main_player_input
+    main_player_input = None
+    input_thread = threading.Thread(target=input_handler)
+    input_thread.start()
+
+    global game_turn_finished
+
+    #clear initalization checks
+    time.sleep(1)
+    os.system('clear')
+    
+
+
+    # game loop
+    while (is_game_running):
+
+        game_turn_finished = False
+
+        # initalize player threads, each player will have its own independent thread process to simulate simultaneous player behavior
+        # needs to be in loop since "threads can only be started once"
+        thread_players = []
+
+        for player_index in range(len(game_players)):
+            thread_players.append(threading.Thread(target=control_player, args=(game_current_player_id, game_players[player_index], player_index)))
+
+        print(f'{game_players[game_current_player_id]}')
+        for player_thread in thread_players:
+            player_thread.start()
+
+        for player_thread in thread_players:
+            player_thread.join()
+
+        game_current_player_id = (game_current_player_id + 1) %  len(game_players)
+    
+    input_thread.join()
+
+def game_visual_handler():
+    pass
 def Game():
-    game_bot_count= input("How many bots?: ")
+    '''
+    The main body of for ERS game
+    It will first:
+    1. Initialize shuffle the deck
+    2. Create the players 
+    3. Distribute out the cards from the deck evenly to the players
+    
+    
+    '''
     game_main_player_name = input("What is your name?: ")
     
     global game_deck 
     game_deck = [] # initialize the game_deck of cards for this game
-
     game_players = [] # Initialize the players playing this game
-    '''
-    Initialize game_deck of cards,
-    Iterate for each suit to create a new value under that suit,
-    Shuffle card objects in game_deck
-    '''
+
+    # Initalize the deck with 52 cards and shuffle
     print(f"\nDeck initializing...(currently {len(game_deck)} in game_deck)")
     for suit in range(4):
         for value in range (1,14):
@@ -26,27 +88,21 @@ def Game():
     random.shuffle(game_deck) # shuffle the game_deck
     print(f"Deck shuffled! (first card now = {str(game_deck[0])})\n")
 
-    '''
-    Create player objects based on desired player count input
-    Also randomize names for bots
-    Include user + input # of users
-    '''
+    # Initialize all players by assigning them an id, name, position for pygame visuals
+    # Bot names are randomly chosen
     random_first_names = ["Zonko", "Fizzler", "Snorple", "Quibly", "Norbix", "Jaxor", "Bloopo", "Zindle", "Crunkle", "Vexon"]
     random_last_names = ["Glimbo", "Torkel", "Zappy", "Marnix", "Flurbo", "Kazzle", "Droopo", "Wibbit", "Tronix", "Blixel"]
     print("Creating players...")
-    game_players.append(Player(0, [], game_main_player_name)) # Create main player
-    for player_index in range(1, int(game_bot_count) + 1): # Create bot playeres
-        game_players.append(Player(player_index, [], random.choice(random_first_names)+random.choice(random_last_names)))
+    game_players.append(Player(0, game_main_player_name, (300, 500))) # Create main player
+    game_players.append(Player(1, random.choice(random_first_names)+random.choice(random_last_names), (0, 250))) # Create main player
+    game_players.append(Player(2, random.choice(random_first_names)+random.choice(random_last_names), (300, 0))) # Create main player
+    game_players.append(Player(3, random.choice(random_first_names)+random.choice(random_last_names), (600, 250))) # Create main player
     print("Players created!")
     print("(", end="", flush=True)
     for game_player in game_players: print(f"{str(game_player)}, ", end="", flush=True)
     print(")", end="", flush=True)
     
-    '''
-    Distribute the current game's game_deck of cards:
-    Start with the 0 player --> take the card at index 0 --> append to player's card inventory while removing it from game game_deck -->
-    move to next player --> repeat until no more cards in game_deck
-    '''
+    # Distribute the game deck of 52 cards evenly to all players
     print("\n\nDistributing cards to players...")
     game_current_player_id = 0
     while(len(game_deck) > 0):
@@ -55,43 +111,51 @@ def Game():
     print("Distributed cards to players!")
     for p in game_players: print(f"({str(p)} has {len(p.inventory)} cards.)")
 
-    is_game_running = True 
+    game_thread = threading.Thread(target=game_handler, args=(game_players))
+    game_thread.start()
 
-    #is_pattern = False
-    game_current_player_id = 0
+    # prepare game visual window
+    pygame.init()
+    game_screen = pygame.display.set_mode((600, 500))
+
+    #load table and floor
+    surface_load = []
+
+    size = (200, 200)
+    x = game_screen.get_rect().centerx - (size[0] // 2)
+    y = game_screen.get_rect().centery - (size[1] // 2)
+    item_rect = pygame.Rect(x, y, size[0], size[1])
+    item_color = '0x7B3F00'
+    item = (item_color, item_rect)
+    surface_load.append(item)
+
+    size = (188, 188)
+    x = game_screen.get_rect().centerx - (size[0] // 2)
+    y = game_screen.get_rect().centery - (size[1] // 2)
+    item_rect = pygame.Rect(x, y, size[0], size[1])
+    item_color =  '0x35654D'
+    item = (item_color, item_rect)
+    surface_load.append(item)
+
+    global is_game_running
+
+    while(is_game_running):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                is_game_running = False
+
+        game_background_color = '0x80001f'
+        game_screen.fill(game_background_color)
+
+        for surface in surface_load:
+            pygame.draw.rect(game_screen, surface[0], surface[1])
+        pygame.display.flip()
+
+    game_thread.join()
 
 
-    global deck_lock
-    deck_lock = threading.Lock()
-    
-    global is_pattern
-    is_pattern = False
 
-    global main_player_input
-    global game_turn_finished
-    main_player_input = None
 
-    input_thread = threading.Thread(target=input_handler)
-    input_thread.start()
-
-    time.sleep(3)
-    os.system('clear')
-    while (is_game_running):
-        game_turn_finished = False
-        threads = []
-        for player_index in range(len(game_players)):
-            threads.append(threading.Thread(target=control_player, args=(game_current_player_id, game_players[player_index], player_index)))
-
-        print(f'{game_players[game_current_player_id]}')
-        for player_thread in threads:
-            player_thread.start()
-
-        for player_thread in threads:
-            player_thread.join()
-
-        game_current_player_id = (game_current_player_id + 1) %  len(game_players)
-    
-    input_thread.join()
 
 def check_pattern():
     top_card_index = len(game_deck) - 1
@@ -154,10 +218,11 @@ class Player:
     '''
     Player = id, card inventory, name
     '''
-    def __init__(self, p_id, inventory, name):
+    def __init__(self, p_id, name, position, inventory = []):
         self.p_id = p_id # integer player identifier
         self.inventory = inventory # list of cards player holds
         self.name = name # string name of player
+        self.position = position
     
     def __str__(self):
         return self.name
