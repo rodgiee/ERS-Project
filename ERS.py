@@ -54,6 +54,7 @@ def game_handler(game_players):
 
     # game loop
     while (is_game_running):
+        check_game(game_players)
 
         game_turn_finished = False
 
@@ -73,6 +74,11 @@ def game_handler(game_players):
 
         game_current_player_id = (game_current_player_id + 1) %  len(game_players)
     
+def check_game(game_players):
+    global is_game_running
+    for player in game_players:
+        if len(player.inventory) >= 52:
+            is_game_running = False
 def Game():
     '''
     The main body of for ERS game
