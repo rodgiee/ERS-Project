@@ -4,6 +4,8 @@ import time
 import threading
 import os
 
+print('hello world')
+print('this is awsome')
 def move_card(game_screen, card):
     # move image
     destination_x = game_screen.get_rect().centerx 
@@ -31,7 +33,6 @@ def game_handler(game_players):
     # game loop main conditional
     # also used by game_visual_handler() to see if game is finished --> closes out if so
     # game_current_player_id checks who's turn is it 
-    global is_game_running
     is_game_running = True 
     game_current_player_id = 0
 
