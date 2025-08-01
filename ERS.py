@@ -32,7 +32,6 @@ def game_handler(game_players):
     # also used by game_visual_handler() to see if game is finished --> closes out if so
     # game_current_player_id checks who's turn is it 
     global is_game_running
-    is_game_running = True 
     game_current_player_id = 0
 
     # mutex lock for game_deck to prevent race conditions
@@ -77,7 +76,8 @@ def game_handler(game_players):
 def check_game(game_players):
     global is_game_running
     for player in game_players:
-        if len(player.inventory) >= 52:
+        if len(player.inventory) >= 48:
+            print(f'{player} wins!')
             is_game_running = False
 def Game():
     '''
