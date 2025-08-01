@@ -107,7 +107,7 @@ def Game():
     game_players.append(Player(3, random.choice(random_first_names)+random.choice(random_last_names), (600, 250))) # Create main player
     print("Players created!")
     print("(", end="", flush=True)
-    for game_player in game_players: print(f"{str(game_player)}, ", end="", flush=True)
+    for player in game_players: print(f"{str(player)}, ", end="", flush=True)
     print(")", end="", flush=True)
 
     # Initalize the deck with 52 cards and shuffle
@@ -131,13 +131,13 @@ def Game():
         card.x = player.position[0]
         card.y = player.position[1]
         card.owner = player
-        card.angle = random.random() * 360
+        card.angle = random.random() * 360 # ensures that card animations don't end up at same angle
         game_players[game_current_player_id].inventory.append(card)
         
         game_current_player_id = (game_current_player_id + 1) % len(game_players)
 
     print("Distributed cards to players!")
-    for p in game_players: print(f"({str(p)} has {len(p.inventory)} cards.)")
+    for player in game_players: print(f"({str(player)} has {len(player.inventory)} cards.)")
 
     global is_game_running
     is_game_running = True
