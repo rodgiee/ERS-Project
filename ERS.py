@@ -8,20 +8,20 @@ def move_card(game_screen, card):
     # move image
     destination_x = game_screen.get_rect().centerx 
     destination_y = game_screen.get_rect().centery
-    rate = 0.03
+    rate = 0.10
     #print(card.x,card.y)
     #print(card.owner.position)
     card.x = card.x + (destination_x - card.x) * rate
     card.y = card.y + (destination_y - card.y) * rate
 
     #rotate image
-    tolerance = 10
+    tolerance = 0.001
     x_bound = destination_x - tolerance <= card.x <= destination_x + tolerance
     y_bound = destination_y - tolerance <= card.y <= destination_y + tolerance
-    if (not(x_bound and y_bound )):
+    if (not(x_bound and y_bound)):
         x_factor = abs(destination_x - abs(card.x)) / destination_x
         y_factor = abs(destination_y - abs(card.y)) / destination_y
-        card.angle += 2 * (x_factor + y_factor) 
+        card.angle += 7 * (x_factor + y_factor) 
     rotated_image = pygame.transform.rotate(card.image, card.angle)
     rotated_image_rect = rotated_image.get_rect(center= (card.x, card.y))
     
@@ -172,6 +172,9 @@ def Game():
     main_player_input = None
 
     card_renderer = []
+    clock = pygame.time.Clock()
+
+    pygame.display.set_caption("ERS")
 
     while(is_game_running):
         # performance issues with rendering more than 10 cards
@@ -207,6 +210,8 @@ def Game():
             move_card(game_screen, card)
 
         pygame.display.flip()
+
+        clock.tick(60)
 
     game_thread.join()
     pygame.quit()
