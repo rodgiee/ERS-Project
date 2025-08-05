@@ -76,7 +76,7 @@ def game_handler(game_players):
 def check_game(game_players):
     global is_game_running
     for player in game_players:
-        if len(player.inventory) >= 48:
+        if len(player.inventory) >= 52:
             print(f'{player} wins!')
             is_game_running = False
 def Game():
@@ -113,7 +113,7 @@ def Game():
     # Initalize the deck with 52 cards and shuffle
     print(f"\nDeck initializing...(currently {len(game_deck)} in game_deck)")
     for suit in range(4):
-        for value in range (2,14):
+        for value in range (2,15):
             game_deck.append(Card(suit, value)) # append this new card to the game_deck list
     print(f"Deck Initalized! (created {len(game_deck)} cards in game_deck)\n")
 
@@ -138,7 +138,7 @@ def Game():
 
     print("Distributed cards to players!")
     for player in game_players: print(f"({str(player)} has {len(player.inventory)} cards.)")
-
+    
     global is_game_running
     is_game_running = True
 
@@ -182,19 +182,20 @@ def Game():
             card_renderer = game_deck[-7:]
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                is_game_running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(pygame.mouse.get_pos())
-            elif event.type == pygame.KEYDOWN:
-                match event.key:
-                    case pygame.K_p:
-                        main_player_input = 'place'
-                    case pygame.K_SPACE:
-                        main_player_input = 'slap'
-                    case pygame.K_a:
-                        print(len(game_players[0].inventory))
-
+            match event.type:
+                    case pygame.QUIT:
+                        is_game_running = False
+                    case pygame.MOUSEBUTTONDOWN:
+                        print(pygame.mouse.get_pos())
+                    case pygame.KEYDOWN:
+                        match event.key:
+                            case pygame.K_p:
+                                main_player_input = 'place'
+                            case pygame.K_SPACE:
+                                main_player_input = 'slap'
+                            case pygame.K_a:
+                                for player in game_players:
+                                    print(f'{player} has {len(player.inventory)} cards.')
         game_background_color = '0x80001f'
         game_screen.fill(game_background_color)
 
@@ -311,7 +312,7 @@ class Card:
     '''
     def __init__(self, suit, value, owner =None,  x=0, y=0, angle=0):
         self.suit = suit # 0 = spades, 1 = clubs, 2 = hearts, 3 = diamonds
-        self.value = value # 1 - 9, face cards
+        self.value = value # 2 - 9, face cards
         self.owner = owner # who owns this card?
 
         self.x = x
