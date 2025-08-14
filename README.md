@@ -1,7 +1,7 @@
 # Egyptian Rat Screw pygame
 **What is Egyptian Rat Screw?**: 
 
-ERS is a face-paced card game where players will race to slap cards in the middle based on pattern!
+ERS is a face-paced card game where players will race to slap cards in the middle to match a pattern!
 
 
 This project aims to recreate ERS in python where visuals are handled by the pygame module and gameplay mechanics are multithreaded.
@@ -16,7 +16,7 @@ This project aims to recreate ERS in python where visuals are handled by the pyg
 
 `space` key to slap in!
 
-*Current patterns include*:
+**Current patterns include**:
 
 
 - Pair (2 consecutive cards of same value)
@@ -29,7 +29,10 @@ This project aims to recreate ERS in python where visuals are handled by the pyg
 - [ ] **Visual**: Hand slap in feedback
 
 
-- [ ] **Visual**: indicator of who's turn it is
+- [ ] **Visual**: Remove terminal window for game information
+
+
+- [ ] **Visual**: Indicator of who's turn it is
 
 
 - [ ] **Mechanic**: Chance system
