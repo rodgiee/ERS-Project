@@ -4,7 +4,8 @@
 ERS is a face-paced card game where players will race to slap cards in the middle based on pattern!
 
 
-This project aims to recreate ERS in python where the visuals are handled by the pygame module
+This project aims to recreate ERS in python where visuals are handled by the pygame module and gameplay mechanics are multithreaded.
+
 ![](https://github.com/rodgiee/ERS-Project/blob/pyinstaller/read_images/ERS-demo-modified_v2.gif)
 
 **How do I play?**:
@@ -22,6 +23,23 @@ This project aims to recreate ERS in python where the visuals are handled by the
 
 
 - Sandwich (2 cards of same value with a random card in between)
+
+
+## To Do:
+- [ ] Visual: Hand slap in feedback
+
+
+- [ ] Visual: indicator of who's turn it is
+
+
+- [ ] Mechanic: Chance system
+
+
+- [ ] Mechanic: Multiplayer?
+
+
+- [ ] Bug: Placed card being placed predeterminedly 
+
 
 ## Credits
 Card graphics and board game assets from the [Boardgame Pack](https://kenney.nl/assets/boardgame-pack)  
