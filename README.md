@@ -8,10 +8,18 @@ This project aims to recreate ERS using pygame (python) and threading!
 ![](https://github.com/rodgiee/ERS-Project/blob/pyinstaller/read_images/ERS-demo-modified_v2.gif)
 
 **How do I play?**:
+
+
 `P` key to place cards once it is your turn
+
+
 `space` key to slap in!
 
 Current patterns include:
-	- Pair (2 consecutive cards of same value)
-	- Sandwich (2 cards of same value with a random card in between)
+
+
+- Pair (2 consecutive cards of same value)
+
+
+- Sandwich (2 cards of same value with a random card in between)
 
