@@ -26,19 +26,19 @@ This project aims to recreate ERS in python where visuals are handled by the pyg
 
 
 ## To Do:
-- [ ] *Visual*: Hand slap in feedback
+- [ ] **Visual**: Hand slap in feedback
 
 
-- [ ] *Visual*: indicator of who's turn it is
+- [ ] **Visual**: indicator of who's turn it is
 
 
-- [ ] *Mechanic*: Chance system
+- [ ] **Mechanic**: Chance system
 
 
-- [ ] *Mechanic*: Multiplayer?
+- [ ] **Mechanic**: Multiplayer?
 
 
-- [ ] *Bug*: Placed card being placed predeterminedly 
+- [ ] **Bug**: Placed card being placed predeterminedly 
 
 
 ## Credits
